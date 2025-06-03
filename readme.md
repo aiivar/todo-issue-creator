@@ -120,7 +120,7 @@
   filters:
     include: ["*.js", "*.py"]
     exclude: ["node_modules", "dist"]
-  issue_template:
+  issueTemplate:
     title: "{description}"
     body: |
       **Задача**: {description}

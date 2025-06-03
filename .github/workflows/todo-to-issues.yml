@@ -42,7 +42,7 @@ jobs:
             - ".*/test/.*"
             - ".*/target/.*"
             - ".*/build/.*"
-        issue_template:
+        issueTemplate:
           title: "{description}"
           body: |
             **Task**: {description}

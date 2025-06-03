@@ -12,6 +12,7 @@ import ru.itis.todo.api.TodoItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -54,8 +55,11 @@ public class GitHubIssueCreator implements IssueCreator {
                     }
                 } else {
                     GHIssueBuilder issueBuilder = repository.createIssue(title)
-                            .body(body)
-                            .label(labels.toArray(new String[0]));
+                            .body(body);
+
+                    for (String label : labels) {
+                        issueBuilder = issueBuilder.label(label);
+                    }
 
                     if (item.getAssignee() != null) {
                         issueBuilder.assignee(item.getAssignee().substring(1)); // Убираем @ из имени

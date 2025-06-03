@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import ru.itis.todo.api.TodoConfig;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SpringBootApplication
 public class TodoIssueCreatorApplication {
@@ -16,7 +17,7 @@ public class TodoIssueCreatorApplication {
     @Bean
     public TodoConfig todoConfig() {
         try {
-            return TodoConfig.fromYaml(Path.of(".todo-to-issue.yaml"));
+            return TodoConfig.fromYaml(Paths.get(ClassLoader.getSystemResource(".todo-to-issue.yaml").toURI()));
         } catch (Exception e) {
             System.err.println("Ошибка загрузки конфигурации: " + e.getMessage());
             System.err.println("Используем конфигурацию по умолчанию");

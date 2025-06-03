@@ -2,9 +2,11 @@ package ru.itis.todo.api.cli;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.springframework.boot.ApplicationArguments;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Представляет параметры командной строки
@@ -21,11 +23,12 @@ public class TodoCliCommand {
     /**
      * Создает команду из аргументов Spring Boot
      */
+    @SneakyThrows
     public static TodoCliCommand fromArgs(ApplicationArguments args) {
         return TodoCliCommand.builder()
                 .configPath(args.containsOption("config") 
                         ? Path.of(args.getOptionValues("config").get(0))
-                        : Path.of(".todo-to-issue.yaml"))
+                        : Paths.get(ClassLoader.getSystemResource(".todo-to-issue.yaml").toURI()))
                 .repo(args.containsOption("repo") 
                         ? args.getOptionValues("repo").get(0)
                         : null)

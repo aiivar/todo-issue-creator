@@ -20,7 +20,7 @@ filters:
     - "dist/**"
     - "**/*Test.java"
 
-issue_template:
+issueTemplate:
   title: "{description}"
   body: |
     **Задача**: {description}
