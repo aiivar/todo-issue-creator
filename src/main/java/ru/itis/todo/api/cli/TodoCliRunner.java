@@ -8,6 +8,7 @@ import ru.itis.todo.api.IssueCreator;
 import ru.itis.todo.api.TodoConfig;
 import ru.itis.todo.api.TodoItem;
 import ru.itis.todo.api.TodoParser;
+import ru.itis.todo.git.GitService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +24,8 @@ import java.util.stream.Stream;
 public class TodoCliRunner implements ApplicationRunner {
     private final List<TodoParser> parsers;
     private final IssueCreator issueCreator;
+    private final GitService gitService;
+    private final TodoConfig config;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -32,17 +35,22 @@ public class TodoCliRunner implements ApplicationRunner {
         }
 
         TodoCliCommand command = TodoCliCommand.fromArgs(args);
-        TodoConfig config = TodoConfig.fromYaml(command.getConfigPath());
 
         // Переопределяем репозиторий из командной строки, если указан
         if (command.getRepo() != null) {
             config.getGithub().setRepo(command.getRepo());
         }
 
+        // Клонируем репозиторий для поиска TODO
+        Path sourceDir = gitService.cloneRepository();
+        if (command.isVerbose()) {
+            System.out.println("Клонирован репозиторий: " + config.getGithub().getRepo());
+        }
+
         List<TodoItem> items = new ArrayList<>();
         
         // Рекурсивно обходим все файлы в исходной директории
-        try (Stream<Path> paths = Files.walk(command.getSourceDir())) {
+        try (Stream<Path> paths = Files.walk(sourceDir)) {
             paths.filter(Files::isRegularFile)
                 .forEach(path -> {
                     // Находим подходящий парсер для файла
@@ -62,6 +70,7 @@ public class TodoCliRunner implements ApplicationRunner {
 
         if (items.isEmpty()) {
             System.out.println("TODO комментарии не найдены");
+            gitService.cleanup();
             return;
         }
 
@@ -72,7 +81,10 @@ public class TodoCliRunner implements ApplicationRunner {
         }
 
         int created = issueCreator.createIssues(items, command.isDryRun());
-        
+
+        // Очищаем временные файлы
+        gitService.cleanup();
+
         if (command.isDryRun()) {
             System.out.printf("%nБудет создано %d issues%n", created);
         } else {
