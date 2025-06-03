@@ -1,0 +1,36 @@
+github:
+  repo: "username/repository"
+  token: "env:GITHUB_TOKEN"
+
+defaults:
+  priority: "medium"
+  category: "feature"
+
+filters:
+  include:
+    - "*.java"
+    - "*.kt"
+    - "*.py"
+    - "*.js"
+    - "*.ts"
+  exclude:
+    - "node_modules/**"
+    - "target/**"
+    - "build/**"
+    - "dist/**"
+    - "**/*Test.java"
+
+issue_template:
+  title: "{description}"
+  body: |
+    **Задача**: {description}
+    **Файл**: {file}
+    **Строка**: {line}
+    **Приоритет**: {priority}
+    **Категория**: {category}
+    {assignee}
+    {tags}
+  labels:
+    - "good first issue"
+    - "{category}"
+    - "{priority}" 

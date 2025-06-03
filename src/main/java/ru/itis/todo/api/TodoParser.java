@@ -3,18 +3,21 @@ package ru.itis.todo.api;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Интерфейс для парсинга TODO комментариев из исходного кода
+ */
 public interface TodoParser {
     /**
-     * Checks if this parser can handle the given file type
-     * @param filePath path to the file
-     * @return true if this parser can handle the file
+     * Парсит TODO комментарии из файла
+     * @param filePath путь к файлу
+     * @return список найденных TODO задач
      */
-    boolean canHandle(Path filePath);
+    List<TodoItem> parseFile(Path filePath);
 
     /**
-     * Parse TODO comments from the given file
-     * @param filePath path to the file
-     * @return list of found TODO comments
+     * Проверяет, поддерживается ли данный тип файла парсером
+     * @param filePath путь к файлу
+     * @return true если файл поддерживается
      */
-    List<TodoComment> parse(Path filePath);
+    boolean supportsFile(Path filePath);
 } 
