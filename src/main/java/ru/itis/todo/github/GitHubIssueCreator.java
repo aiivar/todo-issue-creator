@@ -34,11 +34,15 @@ public class GitHubIssueCreator implements IssueCreator {
     public int createIssues(List<TodoItem> items, boolean dryRun) {
         int count = 0;
         try {
-            init();
+            if (!dryRun) {
+                init();
+            }
 
             for (TodoItem item : items) {
-                if (issueExists(item)) {
-                    continue;
+                if (!dryRun) {
+                    if (issueExists(item)) {
+                        continue;
+                    }
                 }
 
                 String title = formatTitle(item);
