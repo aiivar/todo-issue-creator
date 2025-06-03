@@ -1,0 +1,60 @@
+name: Create Issues from TODOs
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  push:
+    branches: [ main ]
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Create .todo-to-issue.yaml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cat > .todo-to-issue.yaml << EOL
+        github:
+          repo: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+        defaults:
+          priority: MEDIUM
+          category: FEATURE
+        filters:
+          include:
+            - ".*\\.java$"
+          exclude:
+            - ".*/test/.*"
+            - ".*/target/.*"
+            - ".*/build/.*"
+        issue_template:
+          title: "{description}"
+          body: |
+            **Task**: {description}
+            **File**: {file}
+            **Line**: {line}
+            **Priority**: {priority}
+            **Category**: {category}
+          labels:
+            - "good first issue"
+            - "{category}"
+            - "{priority}"
+        EOL
+
+    - name: Build and Run
+      run: mvn spring-boot:run 
