@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.nio.file.Path;
 
-/**
- * Представляет TODO задачу, найденную в исходном коде
- */
 @Data
 @Builder
 public class TodoItem {
@@ -19,7 +16,6 @@ public class TodoItem {
     private String assignee;
     private String[] tags;
     
-    // Значения по умолчанию
     public static final String DEFAULT_PRIORITY = "medium";
     public static final String DEFAULT_CATEGORY = "feature";
 } 

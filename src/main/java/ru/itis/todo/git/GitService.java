@@ -27,10 +27,8 @@ public class GitService {
             throw new IllegalStateException("Repository is not specified in the configuration");
         }
 
-        // Create a temporary directory for the clone
         repoPath = Files.createTempDirectory("todo-scanner-");
         
-        // Clone the repository
         String repoUrl = String.format("https://github.com/%s.git", repo);
         Git.cloneRepository()
                 .setURI(repoUrl)

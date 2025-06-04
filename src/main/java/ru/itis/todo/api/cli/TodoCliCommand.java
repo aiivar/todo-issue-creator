@@ -8,9 +8,6 @@ import org.springframework.boot.ApplicationArguments;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Представляет параметры командной строки
- */
 @Data
 @Builder
 public class TodoCliCommand {
@@ -20,9 +17,6 @@ public class TodoCliCommand {
     private Path sourceDir;
     private boolean verbose;
 
-    /**
-     * Создает команду из аргументов Spring Boot
-     */
     @SneakyThrows
     public static TodoCliCommand fromArgs(ApplicationArguments args) {
         return TodoCliCommand.builder()
@@ -40,9 +34,6 @@ public class TodoCliCommand {
                 .build();
     }
 
-    /**
-     * Выводит справку по использованию
-     */
     public static void printHelp() {
         System.out.println("Использование: todo-issue-creator [опции]");
         System.out.println("Опции:");
