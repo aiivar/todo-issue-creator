@@ -9,9 +9,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Конфигурация для todo-issue-creator
- */
 @Data
 public class TodoConfig {
     private GitHubConfig github;
@@ -44,12 +41,6 @@ public class TodoConfig {
         private List<String> labels;
     }
 
-    /**
-     * Загружает конфигурацию из YAML файла
-     * @param configPath путь к файлу конфигурации
-     * @return объект конфигурации
-     * @throws IOException если файл не найден или не может быть прочитан
-     */
     public static TodoConfig fromYaml(Path configPath) throws IOException {
         try (FileInputStream fis = new FileInputStream(configPath.toFile())) {
             Yaml yaml = new Yaml();

@@ -66,7 +66,7 @@ public class GitHubIssueCreator implements IssueCreator {
                     }
 
                     if (item.getAssignee() != null) {
-                        issueBuilder.assignee(item.getAssignee().substring(1)); // Убираем @ из имени
+                        issueBuilder.assignee(item.getAssignee().substring(1));
                     }
 
                     issueBuilder.create();
@@ -83,7 +83,6 @@ public class GitHubIssueCreator implements IssueCreator {
     public boolean issueExists(TodoItem item) {
         try {
             init();
-            // Ищем issue по заголовку и описанию файла
             String query = String.format("repo:%s \"%s\" in:title \"%s\" in:body",
                     config.getGithub().getRepo(),
                     formatTitle(item),
@@ -91,7 +90,6 @@ public class GitHubIssueCreator implements IssueCreator {
             
             return gitHub.searchIssues().q(query).list().iterator().hasNext();
         } catch (IOException e) {
-            // В случае ошибки считаем, что issue не существует
             return false;
         }
     }

@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-/**
- * Основной класс для запуска CLI приложения
- */
 @Component
 @RequiredArgsConstructor
 public class TodoCliRunner implements ApplicationRunner {
@@ -36,24 +33,20 @@ public class TodoCliRunner implements ApplicationRunner {
 
         TodoCliCommand command = TodoCliCommand.fromArgs(args);
 
-        // Переопределяем репозиторий из командной строки, если указан
         if (command.getRepo() != null) {
             config.getGithub().setRepo(command.getRepo());
         }
 
-        // Клонируем репозиторий для поиска TODO
         Path sourceDir = gitService.cloneRepository();
         if (command.isVerbose()) {
             System.out.println("Клонирован репозиторий: " + config.getGithub().getRepo());
         }
 
         List<TodoItem> items = new ArrayList<>();
-        
-        // Рекурсивно обходим все файлы в исходной директории
+
         try (Stream<Path> paths = Files.walk(sourceDir)) {
             paths.filter(Files::isRegularFile)
                 .forEach(path -> {
-                    // Находим подходящий парсер для файла
                     TodoParser parser = parsers.stream()
                         .filter(p -> p.supportsFile(path))
                         .findFirst()
@@ -82,7 +75,6 @@ public class TodoCliRunner implements ApplicationRunner {
 
         int created = issueCreator.createIssues(items, command.isDryRun());
 
-        // Очищаем временные файлы
         gitService.cleanup();
 
         if (command.isDryRun()) {

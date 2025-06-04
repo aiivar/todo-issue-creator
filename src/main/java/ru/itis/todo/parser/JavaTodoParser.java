@@ -49,7 +49,6 @@ public class JavaTodoParser implements TodoParser {
                 }
             }
         } catch (IOException e) {
-            // Логируем ошибку, но продолжаем работу
             System.err.println("Ошибка при парсинге файла " + filePath + ": " + e.getMessage());
         }
         return items;
