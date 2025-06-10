@@ -16,6 +16,8 @@ import ru.itis.todo.api.IssueCreator;
 import ru.itis.todo.git.GitService;
 import ru.itis.todo.github.GitHubIssueCreator;
 import ru.itis.todo.parser.JavaTodoParser;
+import ru.itis.todo.parser.PythonTodoParser;
+import ru.itis.todo.parser.CSharpTodoParser;
 import ru.itis.todo.api.cli.TodoCliCommand;
 
 import java.io.IOException;
@@ -50,6 +52,12 @@ class ApplicationTests {
 
 	@Autowired
 	private JavaTodoParser javaTodoParser;
+
+	@Autowired
+	private PythonTodoParser pythonTodoParser;
+
+	@Autowired
+	private CSharpTodoParser csharpTodoParser;
 
 	@MockBean
 	private IssueCreator mockIssueCreator;
@@ -145,6 +153,92 @@ class ApplicationTests {
 		assertEquals("Another TODO with metadata", secondItem.getDescription());
 		assertEquals("high", secondItem.getPriority());
 		assertEquals("bug", secondItem.getCategory());
+	}
+
+	@Test
+	@DisplayName("Should support Python file parsing through PythonTodoParser")
+	void shouldSupportPythonFileParsing() throws IOException {
+		// Create a test Python file with TODO comments
+		String pythonContent = """
+            def test_function():
+                # todo: This is a test TODO comment
+                pass
+                
+                # todo: Another TODO with metadata | priority: high | category: bug
+                # Regular comment - not a TODO
+                pass
+            """;
+
+		Path testPythonFile = tempDir.resolve("test.py");
+		Files.writeString(testPythonFile, pythonContent);
+
+		// Test that parser supports Python files
+		assertTrue(pythonTodoParser.supportsFile(testPythonFile));
+
+		// Test parsing functionality
+		List<TodoItem> items = pythonTodoParser.parseFile(testPythonFile);
+		assertNotNull(items);
+		assertEquals(2, items.size());
+
+		// Verify first TODO
+		TodoItem firstItem = items.get(0);
+		assertEquals("This is a test TODO comment", firstItem.getDescription());
+		assertEquals(testPythonFile, firstItem.getFilePath());
+
+		// Verify second TODO with metadata
+		TodoItem secondItem = items.get(1);
+		assertEquals("Another TODO with metadata", secondItem.getDescription());
+		assertEquals("high", secondItem.getPriority());
+		assertEquals("bug", secondItem.getCategory());
+	}
+
+	@Test
+	@DisplayName("Should support C# file parsing through CSharpTodoParser")
+	void shouldSupportCSharpFileParsing() throws IOException {
+		// Create a test C# file with TODO comments
+		String csharpContent = """
+            public class TestClass
+            {
+                // todo: This is a test TODO comment
+                public void TestMethod()
+                {
+                    /* todo: Another TODO with metadata | priority: high | category: bug */
+                    
+                    /*
+                     * todo: Multiline comment TODO | priority: low | category: feature | assignee: @developer
+                     */
+                }
+            }
+            """;
+
+		Path testCSharpFile = tempDir.resolve("Test.cs");
+		Files.writeString(testCSharpFile, csharpContent);
+
+		// Test that parser supports C# files
+		assertTrue(csharpTodoParser.supportsFile(testCSharpFile));
+
+		// Test parsing functionality
+		List<TodoItem> items = csharpTodoParser.parseFile(testCSharpFile);
+		assertNotNull(items);
+		assertEquals(3, items.size());
+
+		// Verify first TODO (single-line comment)
+		TodoItem firstItem = items.get(0);
+		assertEquals("This is a test TODO comment", firstItem.getDescription());
+		assertEquals(testCSharpFile, firstItem.getFilePath());
+
+		// Verify second TODO (inline block comment)
+		TodoItem secondItem = items.get(1);
+		assertEquals("Another TODO with metadata", secondItem.getDescription());
+		assertEquals("high", secondItem.getPriority());
+		assertEquals("bug", secondItem.getCategory());
+
+		// Verify third TODO (multiline block comment)
+		TodoItem thirdItem = items.get(2);
+		assertEquals("Multiline comment TODO", thirdItem.getDescription());
+		assertEquals("low", thirdItem.getPriority());
+		assertEquals("feature", thirdItem.getCategory());
+		assertEquals("@developer", thirdItem.getAssignee());
 	}
 
 	@Test

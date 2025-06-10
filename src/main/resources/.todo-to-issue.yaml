@@ -1,6 +1,6 @@
 github:
-  repo: "username/repository"
-  token: "env:GITHUB_TOKEN"
+  repo: "AssTrahanec/todo-test"
+  token: ""
 
 defaults:
   priority: "medium"
